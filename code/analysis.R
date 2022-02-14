@@ -544,13 +544,13 @@ model {
   }
 
 }
-", file="./models/model_2.txt")
+", file="./models/model.txt")
 
 iterations <- 100000
 burnin <- 1001
 chains <- 3
 
-model.fit <- jags.model(file="./models/model_2.txt",
+model.fit <- jags.model(file="./models/model.txt",
                         
                         data=list(y=as.vector(y),
                                   x1=as.vector(x1),
