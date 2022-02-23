@@ -257,6 +257,16 @@ summary2<-summary(model.samples)$quantiles
 summary<-cbind(summary1,summary2)
 summary<-data.frame(summary)
 
+
+#---- convergence ----#
+
+# Gelman-Rubin convergence diagnostic
+conv <- gelman.diag(model.samples)
+
+# subset parameters not converged (note: 1.2 is a less conservative threshold that can be used)
+conv$psrf[conv$psrf[,'Upper C.I.'] > 1.1,]
+
+
 #---- in-sample model fit ----#
 
 # mcmc list to data.frame
