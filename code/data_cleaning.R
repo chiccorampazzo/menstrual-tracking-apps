@@ -541,6 +541,14 @@ df$UNMModN <- as.character(df$UNMModN)
 df$CPTradN <- as.character(df$CPTradN)
 df$DEMTotN <- as.character(df$DEMTotN)
 
+# https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+# Classification of the economies 
+CLASS <- read_excel("data/CLASS.xlsx")
+CLASS$iso_2c <- countrycode(CLASS$Economy, origin = "country.name", destination="iso2c")
+CLASS <- CLASS %>% select(iso_2c, `Income group`)
+df <- df %>% left_join(CLASS, by="iso_2c")
+# Vietnam Lower middle income
+df$`Income group`[120] <- "Lower middle income"
 
 
 write.csv(df, "data/covariates.csv")
