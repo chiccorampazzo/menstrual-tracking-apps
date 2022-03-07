@@ -362,11 +362,11 @@ delta_m3 <- delta_m3 %>% mutate(delta = recode(delta,
                                          'delta[5]'="ITU Internet",
                                          'delta[6]'="ITU Mobile", 
                                          'delta[7]'="Low-income economies",
-                                         'delta[8]'="Upper-middle-income economies",
+                                         'delta[8]'="Lower-middle-income economies",
                                          'delta[9]'="High-income economies"))
 
 # Add rows for reference category
-delta_m3 <- delta_m3 %>% add_row("delta"="Lower-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
+delta_m3 <- delta_m3 %>% add_row("delta"="Upper-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
 
 
 delta_m3 <- delta_m3 %>% mutate(group_c = recode(delta, 
@@ -378,8 +378,8 @@ delta_m3 <- delta_m3 %>% mutate(group_c = recode(delta,
                                            "ITU Internet"="group3",
                                            "ITU Mobile"="group3", 
                                            "Low-income economies"="group4",
-                                           "Lower-middle-income economies"="group5",
-                                           "Upper-middle-income economies"="group4",
+                                           "Lower-middle-income economies"="group4",
+                                           "Upper-middle-income economies"="group5",
                                            "High-income economies"="group4"))
 
 
@@ -523,7 +523,7 @@ plotFit(plotdat.m4, zoom=0.8)
 plotFit(plotdat.m4, predCol='median')
 plotFit(plotdat.m4, predCol='median', zoom=0.8)
 
-# 0.775
+# 0.766
 
 #-----------------------------#
 
@@ -544,16 +544,16 @@ delta_m4 <- delta_m4 %>% mutate(delta = recode(delta,
                                                'delta[5]'="ITU Internet",
                                                'delta[6]'="ITU Mobile", 
                                                'delta[7]'="Low-income economies",
-                                               'delta[8]'="Upper-middle-income economies",
+                                               'delta[8]'="Lower-middle-income economies",
                                                'delta[9]'="High-income economies",
                                                
                                                'delta[10]'="ITU Internet - Low-income economies", 
-                                               'delta[11]'="ITU Internet - Upper-middle-income economies",
+                                               'delta[11]'="ITU Internet - Lower-middle-income economies",
                                                'delta[12]'="ITU Internet - High-income economies"))
 
 # Add rows for reference category
-delta_m4 <- delta_m4 %>% add_row("delta"="Lower-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
-delta_m4 <- delta_m4 %>% add_row("delta"="ITU Internet - Lower-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
+delta_m4 <- delta_m4 %>% add_row("delta"="Upper-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
+delta_m4 <- delta_m4 %>% add_row("delta"="ITU Internet - Upper-middle-income economies", "2.5%"=0,  "25%"=0,   "50%"=0,   "75%"=0,   "97.5%"=0)
 
 
 delta_m4 <- delta_m4 %>% mutate(group_c = recode(delta, 
@@ -565,12 +565,12 @@ delta_m4 <- delta_m4 %>% mutate(group_c = recode(delta,
                                                  "ITU Internet"="group3",
                                                  "ITU Mobile"="group3", 
                                                  "Low-income economies"="group4",
-                                                 "Lower-middle-income economies"="group5",
-                                                 "Upper-middle-income economies"="group4",
+                                                 "Lower-middle-income economies"="group4",
+                                                 "Upper-middle-income economies"="group5",
                                                  "High-income economies"="group4",
                                                  "ITU Internet - Low-income economies"="group6",
-                                                 "ITU Internet - Upper-middle-income economies"="group6",
-                                                 "ITU Internet - Lower-middle-income economies"="group5",
+                                                 "ITU Internet - Upper-middle-income economies"="group5",
+                                                 "ITU Internet - Lower-middle-income economies"="group6",
                                                  "ITU Internet - High-income economies"="group6"))
 
 
