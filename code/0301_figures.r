@@ -1,3 +1,22 @@
+# INFO 
+#After running 0300, here we run the code for creating the 3 figures.But, running 0300 is not necessary, as files are saved in the data folder. The figures are as follows. First, the topics in the descriptions, then topics by review of individual apps, and then the topics by languages.
+
+#Data files required for this code:
+#Section 10 (Descriptions)
+#* 0300_descriptions_documentmatrix.csv
+#* 0300_descriptions_mytopic_lists_recoded.csv
+#* 0300_0_numberofapps.csv
+
+#Section 20 (Reviews)
+#* 0300_topicdocumentmatrix_detailed_summarised.csv
+#* 0301_mytopic_lists_lookup.csv
+#* 0300_0_numberofapps.csv
+
+#Section 30 (Languages)
+#* 0300_topicdocumentmatrix_languages.csv
+#* 0301_mytopic_lists_original_shortened.csv
+#* 0305_top_20_languages_character.csv
+
 # 10: Descriptions ####
 rm(list = ls()) # start afresh
 library(tidyverse)
