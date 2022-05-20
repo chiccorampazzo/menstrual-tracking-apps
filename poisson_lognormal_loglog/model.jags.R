@@ -8,15 +8,24 @@ model {
     pop[k] ~ dpois(installs_country[k] / rate[k])
     rate[k] ~ dlnorm(mu[k], pow(sigma, -2))
     
+    mu[k] <- effects[k] + sum(interactions[k,])
+    
     # posterior predictions
     pop_hat[k] ~ dpois(installs_country_hat[k] / rate_hat[k])
     rate_hat[k] ~ dlnorm(mu[k], pow(sigma, -2))
     
   }
   
-  # regression
-  mu <- X %*% alpha
+  # covariate effects
+  effects <- X %*% alpha[1:n_covs]
   
+  # covariate interactions
+  for(k in 1:n_countries){
+    for(i in 1:n_interacts){
+      interactions[k,i] <- alpha[n_covs+i] * X[k,interact[i,1]] * X[k,interact[i,2]]
+    }
+  }
+
   # missing values
   for(i in 1:n_xmiss){
     for(k in 1:n_countries){
@@ -26,7 +35,7 @@ model {
   
   # priors
   sigma ~ dunif(0, 5)
-  for(i in 1:n_X) {
+  for(i in 1:(n_covs + n_interacts)) {
     alpha[i] ~ dnorm(0, pow(5, -2))
   }
 
