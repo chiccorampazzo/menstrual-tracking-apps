@@ -1,3 +1,4 @@
+# cleanup
 rm(list=ls());gc();cat("\014");try(dev.off())
 
 # packages
@@ -45,6 +46,8 @@ interact_list[['m4bis']] <-  list(c('income_low','CPModP'),
                                   c('income_upmid','CPModP'),
                                   c('income_high','CPModP'))
 
+# additional interactions
+# UNMP x income
 
 #---- run all models ----#
 overwrite <- F

@@ -4,6 +4,6 @@ mcmcToDataframe <- function(mcmc_list){
   for(i in 2:length(mcmc_list)){
     d <- rbind(d, mcmc_list[[i]])
   }
-  d <- data.frame(d)
+  d <- as.data.frame(d)
   return(d)
 }
