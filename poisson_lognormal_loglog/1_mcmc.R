@@ -105,7 +105,7 @@ for(model_name in names(cov_sets)){
   # extend until converged
   extend_num <- 0
   psrf_threshold <- 1.2
-  while(max(psrf$psrf[,'Upper C.I.']) > psrf_threshold & etend_num < 10){
+  while(max(psrf$psrf[,'Upper C.I.']) > psrf_threshold & extend_num < 10){
     
     extend_num <- extend_num + 1
     
