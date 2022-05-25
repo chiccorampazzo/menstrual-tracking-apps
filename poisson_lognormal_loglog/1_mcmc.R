@@ -2,7 +2,7 @@
 rm(list=ls());gc();cat("\014");try(dev.off())
 
 # packages
-install.packages(c('runjags', 'coda', 'fastDummies'))
+# install.packages(c('runjags', 'coda', 'fastDummies'))
 library(runjags)
 library(coda)
 library(fastDummies)
@@ -31,9 +31,14 @@ sum_by_country <- read.csv("../data/sum.csv",
                            stringsAsFactors = F)
 
 # format covariates as numeric
-for(i in which(names(covs)=='CPAnyP'):which(names(covs)=='gdp_pc')){ 
+continuous_covs <- which(names(covs)=='CPAnyP'):which(names(covs)=='gdp_pc')
+for(i in continuous_covs){ 
   covs[,i] <- as.numeric(covs[,i]) 
 }
+
+# covariate correlations
+write.csv(cor(covs[,continuous_covs], use='pairwise.complete.obs'),
+          file.path(outdir, '..', 'covariate_correlations.csv'))
 
 # covariate sets
 cov_sets <- list(m1 = c('intercept', 'CPModP', 'CPTrad', 'UNMP', 'tfr'))
@@ -54,10 +59,8 @@ interact_list[['m4bis']] <-  list(c('income_low','CPModP'),
                                   c('income_upmid','CPModP'),
                                   c('income_high','CPModP'))
 
-interact_list[['m5']] <-  list(c('gdp_pc','UNMN'))
+interact_list[['m5']] <-  list(c('gdp_pc','UNMP'))
 
-# additional interactions
-# UNMP x income
 
 #---- run all models ----#
 overwrite <- F

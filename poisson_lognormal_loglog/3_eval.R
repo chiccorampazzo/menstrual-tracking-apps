@@ -39,6 +39,19 @@ for(i in 1:length(fits)){
   }
 }
 
+# components of fit analysis
+eval_types <- c('insample', 'outsample')
+responses <- c('pop', 'installs')
+
+# setup data.frame for residuals analysis
+names_residual <- c('model', 'eval_type', 'response', 'stat', 'r2',
+                    'bias', 'imprecision', 'inaccuracy',
+                    'bias_std', 'imprecision_std', 'inaccuracy_std')
+residual <- data.frame(matrix(NA, 
+                              nrow=0, 
+                              ncol=length(names_residual)))
+names(residual) <- names_residual
+
 # fit plots
 for(i in 1:length(fits)){
   
@@ -50,14 +63,16 @@ for(i in 1:length(fits)){
   
   fit <- readRDS(file.path(fits[i]))
   
-  for(eval_type in c('insample', 'outsample')){
+  for(eval_type in eval_types){
     
-    for(response in c('pop', 'installs')){
+    for(response in responses){
       
       if(eval_type == 'insample'){
         d <- mcmcToDataframe(fit$mcmc)
       } else {
-        d <- readRDS(file.path(outdir, model_name, 'xval', response, 'd.rds'))  
+        dfile <- file.path(outdir, model_name, 'xval', response, 'd.rds')
+        if(!file.exists(dfile)) next
+        d <- readRDS(dfile)  
       }
       
       if(response == 'pop') {
@@ -90,10 +105,31 @@ for(i in 1:length(fits)){
                   zoom = 0.8, 
                   main = paste(eval_type, 'fit:', model_name, stat, response, '(zoom)'))
         }
+        
+        # analyze residuals
+        hat_values <- apply(d[,hat], 2, ifelse(stat=='mean', mean, median))
+        resid <- hat_values - obs
+        resid_std <- resid / hat_values
+        
+        residual_row <- data.frame(matrix(NA, nrow=1, ncol=length(names_residual)))
+        names(residual_row) <- names_residual
+        
+        residual_row$model <- model_name
+        residual_row$eval_type <- eval_type
+        residual_row$response <- response
+        residual_row$stat <- stat
+        residual_row$r2 <- cor(obs, hat_values, use='pairwise.complete.obs')^2
+        residual_row$bias <- mean(resid, na.rm=T)
+        residual_row$imprecision <- sd(resid, na.rm=T)
+        residual_row$inaccuracy <- mean(abs(resid), na.rm=T)
+        residual_row$bias_std <- mean(resid_std, na.rm=T)
+        residual_row$imprecision_std <- sd(resid_std, na.rm=T)
+        residual_row$inaccuracy_std <- mean(abs(resid_std), na.rm=T)
+        
+        residual <- rbind(residual, residual_row)
       }
     }
   }
 }
 
-
-
+write.csv(residual, file.path(outdir, 'residual_analysis.csv'), row.names=F)
