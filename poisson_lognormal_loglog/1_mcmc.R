@@ -28,13 +28,18 @@ covs <- read.csv("../data/covariates_installations.csv",
 sum_by_country <- read.csv("../data/sum.csv", 
                            stringsAsFactors = F)
 
+# format covariates as numeric
+for(i in which(names(covs)=='CPAnyP'):which(names(covs)=='gdp_pc')){ 
+  covs[,i] <- as.numeric(covs[,i]) 
+}
+
 # covariate sets
 cov_sets <- list(m1 = c('intercept', 'CPModP', 'CPTrad', 'UNMP', 'tfr'))
 cov_sets[['m2']] <- c(cov_sets[['m1']], 'itu_internet', 'itu_mobile')
 cov_sets[['m3']] <- c(cov_sets[['m2']], 'income_low', 'income_upmid', 'income_high')
 cov_sets[['m4']] <- cov_sets[['m3']]
 cov_sets[['m4bis']] <- cov_sets[['m3']]
-cov_sets[['m5']] <- c(cov_sets[['m3']], 'gdp_pc')
+cov_sets[['m5']] <- c(cov_sets[['m2']], 'gdp_pc')
 
 # interactions
 interact_list <- list()
@@ -47,9 +52,7 @@ interact_list[['m4bis']] <-  list(c('income_low','CPModP'),
                                   c('income_upmid','CPModP'),
                                   c('income_high','CPModP'))
 
-interact_list[['m5']] <-  list(c('income_low','UNMN'),
-                               c('income_upmid','UNMN'),
-                               c('income_high','UNMN'))
+interact_list[['m5']] <-  list(c('gdp_pc','UNMN'))
 
 # additional interactions
 # UNMP x income

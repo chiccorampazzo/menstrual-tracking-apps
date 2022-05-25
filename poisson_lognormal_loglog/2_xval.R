@@ -21,7 +21,7 @@ fits <- list.files(file.path('out', 'mcmc'), full.names=T)
 # setup k folds
 if(file.exists(file.path(outdir, 'xval_itest.rds'))){
   itest <- readRDS(file.path(outdir, 'xval_itest.rds'))
-  nk <- length(itest[['country']])
+  nk <- length(itest[['pop']])
 } else {
   nk <- 10
   itest <- list()
