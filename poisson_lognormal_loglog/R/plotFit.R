@@ -1,5 +1,5 @@
 # plot fit of predictions
-plotFit <- function(dat, main=NULL, xlab=NULL, ylab=NULL, file=NULL, zoom=1, predCol='mean'){
+plotFit <- function(dat, main='Model Fit', xlab=NULL, ylab=NULL, file=NULL, zoom=1, predCol='mean'){
   
   print(paste('Observed vs predicted plot:', file))
   
@@ -19,7 +19,7 @@ plotFit <- function(dat, main=NULL, xlab=NULL, ylab=NULL, file=NULL, zoom=1, pre
   # labels
   if(is.null(xlab)) xlab <- 'Observed'
   if(is.null(ylab)) ylab <- 'Predicted'
-  if(is.null(main)) main <- paste0('In-sample Model Fit\nr-squared = ',r2)
+  main <- paste0(main,'\nr-squared = ',r2)
   
   par(mar=c(4,4,1,1) + 0.5)
   

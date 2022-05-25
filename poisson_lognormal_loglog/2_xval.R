@@ -25,21 +25,21 @@ if(file.exists(file.path(outdir, 'xval_itest.rds'))){
 } else {
   nk <- 10
   itest <- list()
-  itest[['country']] <- ixval(n = readRDS(file.path(fits[1]))$md$n_countries, nk = nk)
-  itest[['app']] <- ixval(n = readRDS(file.path(fits[1]))$md$n_apps, nk = nk)
+  itest[['pop']] <- ixval(n = readRDS(file.path(fits[1]))$md$n_countries, nk = nk)
+  itest[['installs']] <- ixval(n = readRDS(file.path(fits[1]))$md$n_apps, nk = nk)
   saveRDS(itest, file=file.path(outdir, 'xval_itest.rds'))
 }
 
 # cross-validate each model
 overwrite <- FALSE
-for(xval_type in names(itest)){
+for(ifit in 1:length(fits)){
   
-  for(ifit in 1:length(fits)){
+  for(response in names(itest)){
     
     model_name <- tools::file_path_sans_ext(basename(fits[ifit]))
     
     # output directory
-    xvaldir <- file.path(outdir, model_name, 'xval', xval_type)
+    xvaldir <- file.path(outdir, model_name, 'xval', response)
     dir.create(xvaldir, showWarnings=F, recursive=T)
     
     # load original fit model
@@ -54,18 +54,18 @@ for(xval_type in names(itest)){
         message(paste0('Cross-validating model: ', model_name , ' (k=', k, ')'))
         
         # parameters to monitor
-        if(xval_type == 'country'){
-          monitor <- paste0('pop_hat[',itest[[xval_type]][[k]],']')
-        } else if(xval_type == 'app'){
-          monitor <- paste0('installs_hat[',itest[[xval_type]][[k]],',1]')
+        if(response == 'pop'){
+          monitor <- paste0('pop_hat[',itest[[response]][[k]],']')
+        } else if(response == 'installs'){
+          monitor <- paste0('installs_hat[',itest[[response]][[k]],',1]')
         }
         
         # modify data
         md <- fit_orig$md
-        if(xval_type == 'country'){
-          md$pop[itest[[xval_type]][[k]]] <- NA
-        } else if(xval_type == 'app'){
-          md$installs[itest[[xval_type]][[k]], 1] <- NA
+        if(response == 'pop'){
+          md$pop[itest[[response]][[k]]] <- NA
+        } else if(response == 'installs'){
+          md$installs[itest[[response]][[k]], 1] <- NA
         }
         
         # initials
@@ -115,5 +115,22 @@ for(xval_type in names(itest)){
         saveRDS(fit, outfile)
       }
     }
+    
+    # combine k-results into single dataframe
+    d <- mcmcToDataframe(readRDS(file.path(xvaldir, 'fit_xval1.rds'))$mcmc)
+    for(k in 2:nk){
+      dk <- mcmcToDataframe(readRDS(file.path(xvaldir, paste0('fit_xval', k, '.rds')))$mcmc)
+      if(nrow(d) < nrow(dk)){
+        dpad <- matrix(NA, ncol=ncol(d), nrow=nrow(dk)-nrow(d))
+        colnames(dpad) <- colnames(d)
+        d <- rbind(d, dpad)
+      } else if(nrow(dk) < nrow(d)){
+        dpad <- matrix(NA, ncol=ncol(dk), nrow=nrow(d)-nrow(dk))
+        colnames(dpad) <- colnames(dk)
+        dk <- rbind(dk, dpad)
+      }
+      d <- cbind(d, dk)
+    }
+    saveRDS(d, file=file.path(xvaldir, 'd.rds'))
   }
 }

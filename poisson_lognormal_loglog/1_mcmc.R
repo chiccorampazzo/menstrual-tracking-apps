@@ -34,6 +34,7 @@ cov_sets[['m2']] <- c(cov_sets[['m1']], 'itu_internet', 'itu_mobile')
 cov_sets[['m3']] <- c(cov_sets[['m2']], 'income_low', 'income_upmid', 'income_high')
 cov_sets[['m4']] <- cov_sets[['m3']]
 cov_sets[['m4bis']] <- cov_sets[['m3']]
+cov_sets[['m5']] <- c(cov_sets[['m3']], 'gdp_pc')
 
 # interactions
 interact_list <- list()
@@ -45,6 +46,10 @@ interact_list[['m4']] <- list(c('income_low','itu_internet'),
 interact_list[['m4bis']] <-  list(c('income_low','CPModP'),
                                   c('income_upmid','CPModP'),
                                   c('income_high','CPModP'))
+
+interact_list[['m5']] <-  list(c('income_low','UNMN'),
+                               c('income_upmid','UNMN'),
+                               c('income_high','UNMN'))
 
 # additional interactions
 # UNMP x income
