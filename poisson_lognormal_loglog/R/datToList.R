@@ -1,3 +1,4 @@
+library(fastDummies)
 datToList <- function(appstore, playstore, covs, sum_by_country, 
                       cov_select=c('intercept'), interact_select=list()){
   
@@ -58,8 +59,8 @@ datToList <- function(appstore, playstore, covs, sum_by_country,
   
   names(covs)[which(names(covs)=='Income.group')] <- 'income'
   
-  covs <- dummy_cols(covs, select_columns = "region")
-  covs <- dummy_cols(covs, select_columns = "income")
+  covs <- fastDummies::dummy_cols(covs, select_columns = "region")
+  covs <- fastDummies::dummy_cols(covs, select_columns = "income")
   
   # create X
   X <- data.frame(intercept = rep(1, nrow(covs)),

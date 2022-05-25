@@ -2,8 +2,10 @@
 rm(list=ls());gc();cat("\014");try(dev.off())
 
 # packages
+install.packages(c('runjags', 'coda', 'fastDummies'))
 library(runjags)
 library(coda)
+library(fastDummies)
 
 # working directory
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -93,26 +95,27 @@ for(model_name in names(cov_sets)){
   init <- inits(md)
   
   # mcmc
-  fit <- run.jags(model = 'model.jags.R',
-                  data = md,
-                  monitor = monitor,
-                  inits = init,
-                  n.chains = 3,
-                  thin = 10,
-                  sample = 10e3,
-                  burnin = 50e3,
-                  adapt = 1e3,
-                  summarise = F,
-                  method = 'parallel')
+  fit <- runjags::run.jags(model = 'model.jags.R',
+                           data = md,
+                           monitor = monitor,
+                           inits = init,
+                           n.chains = 3,
+                           thin = 10,
+                           sample = 10e3,
+                           burnin = 50e3,
+                           adapt = 1e3,
+                           summarise = F,
+                           method = 'parallel')
   
   # check convergence
-  names.psrf <- varnames(fit$mcmc)
+  names.psrf <- coda::varnames(fit$mcmc)
   names.psrf <- names.psrf[!grepl('hat', names.psrf)]
-  psrf <- gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
+  
+  psrf <- coda::gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
 
   # extend until converged
   extend_num <- 0
-  psrf_threshold <- 1.2
+  psrf_threshold <- 1.2 # i possible, use 1.2 for testing and 1.1 for final models
   while(max(psrf$psrf[,'Upper C.I.']) > psrf_threshold & extend_num < 10){
     
     extend_num <- extend_num + 1
@@ -121,9 +124,9 @@ for(model_name in names(cov_sets)){
     
     print(psrf$psrf[psrf$psrf[,'Upper C.I.'] > psrf_threshold,])
     
-    fit <- extend.jags(fit)
+    fit <- runjags::extend.jags(fit)
     
-    psrf <- gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
+    psrf <- coda::gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
   }
   
   # save
