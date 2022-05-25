@@ -75,20 +75,20 @@ for(ifit in 1:length(fits)){
         set.seed(md$seed)
         
         # mcmc
-        fit <- run.jags(model = 'model.jags.R',
-                        data = md,
-                        monitor = monitor,
-                        inits = init,
-                        n.chains = length(fit_orig$init),
-                        thin = fit_orig$thin,
-                        sample = fit_orig$sample,
-                        burnin = fit_orig$burnin - 1e3,
-                        adapt = 1e3,
-                        summarise = F,
-                        method = 'parallel')
+        fit <- runjags::run.jags(model = 'model.jags.R',
+                                 data = md,
+                                 monitor = monitor,
+                                 inits = init,
+                                 n.chains = length(fit_orig$init),
+                                 thin = fit_orig$thin,
+                                 sample = fit_orig$sample,
+                                 burnin = fit_orig$burnin - 1e3,
+                                 adapt = 1e3,
+                                 summarise = F,
+                                 method = 'parallel')
         
         # check convergence
-        psrf <- gelman.diag(fit$mcmc, multivariate=F)
+        psrf <- coda::gelman.diag(fit$mcmc, multivariate=F)
         
         # extend until converged
         extend_num <- 0
@@ -101,9 +101,9 @@ for(ifit in 1:length(fits)){
           
           print(psrf$psrf[psrf$psrf[,'Upper C.I.'] > psrf_threshold,])
           
-          fit <- extend.jags(fit)
+          fit <- runjags::extend.jags(fit)
           
-          psrf <- gelman.diag(fit$mcmc, multivariate=F)
+          psrf <- coda::gelman.diag(fit$mcmc, multivariate=F)
         }
         
         # save
@@ -119,12 +119,17 @@ for(ifit in 1:length(fits)){
     # combine k-results into single dataframe
     d <- mcmcToDataframe(readRDS(file.path(xvaldir, 'fit_xval1.rds'))$mcmc)
     for(k in 2:nk){
+      
       dk <- mcmcToDataframe(readRDS(file.path(xvaldir, paste0('fit_xval', k, '.rds')))$mcmc)
+      
       if(nrow(d) < nrow(dk)){
+        
         dpad <- matrix(NA, ncol=ncol(d), nrow=nrow(dk)-nrow(d))
         colnames(dpad) <- colnames(d)
         d <- rbind(d, dpad)
+        
       } else if(nrow(dk) < nrow(d)){
+        
         dpad <- matrix(NA, ncol=ncol(dk), nrow=nrow(d)-nrow(dk))
         colnames(dpad) <- colnames(dk)
         dk <- rbind(dk, dpad)
