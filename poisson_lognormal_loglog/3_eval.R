@@ -23,7 +23,7 @@ overwrite <- FALSE
 for(i in 1:length(fits)){
   
   model_name <- tools::file_path_sans_ext(basename(fits[i]))
-  message(paste0('Evaluating model: ', model_name))
+  message(paste0('Trace plots: ', model_name))
   
   dir.create(file.path(outdir, model_name), showWarnings=F, recursive=T)
   
@@ -44,12 +44,15 @@ eval_types <- c('insample', 'outsample')
 responses <- c('pop', 'installs')
 
 # setup data.frame for residuals analysis
-names_residual <- c('model', 'eval_type', 'response', 'stat', 'r2',
-                    'bias', 'imprecision', 'inaccuracy',
-                    'bias_std', 'imprecision_std', 'inaccuracy_std')
+names_residual <- c('model', 'response', 'eval_type', 'stat', 'r2',
+                    'bias', 'bias_std', 
+                    'imprecision', 'imprecision_std', 
+                    'inaccuracy', 'inaccuracy_std')
+
 residual <- data.frame(matrix(NA, 
                               nrow=0, 
                               ncol=length(names_residual)))
+
 names(residual) <- names_residual
 
 # fit plots
@@ -63,10 +66,10 @@ for(i in 1:length(fits)){
   
   fit <- readRDS(file.path(fits[i]))
   
-  for(eval_type in eval_types){
+  for(response in responses){
     
-    for(response in responses){
-      
+    for(eval_type in eval_types){
+    
       if(eval_type == 'insample'){
         d <- mcmcToDataframe(fit$mcmc)
       } else {
@@ -107,9 +110,9 @@ for(i in 1:length(fits)){
         }
         
         # analyze residuals
-        hat_values <- apply(d[,hat], 2, ifelse(stat=='mean', mean, median))
-        resid <- hat_values - obs
-        resid_std <- resid / hat_values
+        dat <- plotDat(d, obs=obs, hat=hat, alpha=0.1)
+        dat$resid <- dat[,stat] - dat$obs
+        dat$resid_std <- resid / dat$obs
         
         residual_row <- data.frame(matrix(NA, nrow=1, ncol=length(names_residual)))
         names(residual_row) <- names_residual
@@ -118,13 +121,13 @@ for(i in 1:length(fits)){
         residual_row$eval_type <- eval_type
         residual_row$response <- response
         residual_row$stat <- stat
-        residual_row$r2 <- cor(obs, hat_values, use='pairwise.complete.obs')^2
-        residual_row$bias <- mean(resid, na.rm=T)
-        residual_row$imprecision <- sd(resid, na.rm=T)
-        residual_row$inaccuracy <- mean(abs(resid), na.rm=T)
-        residual_row$bias_std <- mean(resid_std, na.rm=T)
-        residual_row$imprecision_std <- sd(resid_std, na.rm=T)
-        residual_row$inaccuracy_std <- mean(abs(resid_std), na.rm=T)
+        residual_row$r2 <- cor(dat$obs, dat[,stat], use='pairwise.complete.obs')^2
+        residual_row$bias <- mean(dat$resid, na.rm=T)
+        residual_row$imprecision <- sd(dat$resid, na.rm=T)
+        residual_row$inaccuracy <- mean(abs(dat$resid), na.rm=T)
+        residual_row$bias_std <- mean(dat$resid_std, na.rm=T)
+        residual_row$imprecision_std <- sd(dat$resid_std, na.rm=T)
+        residual_row$inaccuracy_std <- mean(abs(dat$resid_std), na.rm=T)
         
         residual <- rbind(residual, residual_row)
       }
