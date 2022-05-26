@@ -14,12 +14,16 @@ for(i in list.files('R')) source(file.path('R',i))
 outdir <- file.path('out')
 dir.create(outdir, recursive=T, showWarnings=F)
 
-# models
-fits <- list.files(file.path('out', 'mcmc'), full.names=T)
+# alpha-level (alpha=0.05 will provide 95% credible intervals)
+alpha = 0.05
 
+# overwrite previous results?
 overwrite <- FALSE
 
-# trace plots
+# list models
+fits <- list.files(file.path('out', 'mcmc'), full.names=T)
+
+# trace plots and parameter summaries
 for(i in 1:length(fits)){
   
   model_name <- tools::file_path_sans_ext(basename(fits[i]))
@@ -37,9 +41,18 @@ for(i in 1:length(fits)){
           tracedir = tracedir,
           vars = grep('hat', varnames(fit$mcmc), invert=T, value=T))
   }
+  
+  # parameter summaries
+  outfile <- file.path(outdir, model_name, 'summary.csv')
+  if(!file.exists(outfile) | overwrite){
+    fit.summary <- summary(fit$mcmc)
+    fit.summary <- data.frame(cbind(fit.summary$statistics, fit.summary$quantiles))
+    
+    write.csv(fit.summary, file.path(outdir, model_name, 'summary.csv'))
+  }
 }
 
-# components of fit analysis
+# setup fit analysis
 eval_types <- c('insample', 'outsample')
 responses <- c('pop', 'installs')
 
@@ -92,7 +105,7 @@ for(i in 1:length(fits)){
         
         outfile <- paste0(basename, stat, '.jpg')
         if(!file.exists(outfile) | overwrite){
-          dat <- plotDat(d, obs=obs, hat=hat, alpha=0.1)
+          dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
           plotFit(dat, 
                   file = outfile, 
                   predCol = stat, 
@@ -101,7 +114,7 @@ for(i in 1:length(fits)){
         
         outfile <- paste0(basename, stat, '_zoom.jpg')
         if(!file.exists(outfile) | overwrite){
-          dat <- plotDat(d, obs=obs, hat=hat, alpha=0.1)
+          dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
           plotFit(dat, 
                   file = outfile, 
                   predCol = stat, 
@@ -110,7 +123,7 @@ for(i in 1:length(fits)){
         }
         
         # analyze residuals
-        dat <- plotDat(d, obs=obs, hat=hat, alpha=0.1)
+        dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
         dat$resid <- dat[,stat] - dat$obs
         dat$resid_std <- resid / dat$obs
         
@@ -135,4 +148,6 @@ for(i in 1:length(fits)){
   }
 }
 
+# save residuals analysis (bias, imprecision, inaccuracy)
 write.csv(residual, file.path(outdir, 'residual_analysis.csv'), row.names=F)
+
