@@ -4,14 +4,14 @@ model {
   
   for(k in 1:n_countries){
     
-    # likelihood: app installations per woman (rate) by country
+    # likelihood: rate of app installations per woman (pop) by country (k)
     pop[k] ~ dpois(installs_country[k] / rate[k])
     rate[k] ~ dlnorm(mu[k], pow(sigma, -2))
     
     mu[k] <- effects[k] + sum(interactions[k,])
     
     # posterior predictions
-    pop_hat[k] ~ dpois(installs_country_hat[k] / rate_hat[k])
+    pop_hat[k] ~ dpois(installs_country[k] / rate_hat[k])
     rate_hat[k] ~ dlnorm(mu[k], pow(sigma, -2))
     
   }
@@ -51,7 +51,6 @@ model {
       
       # posterior predictions
       installs_hat[i,j] ~ dpois(lambda[i,j])
-      
     }
   }
   
