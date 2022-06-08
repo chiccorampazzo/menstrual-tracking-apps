@@ -43,23 +43,36 @@ write.csv(cor(covs[,continuous_covs], use='pairwise.complete.obs'),
 # covariate sets
 cov_sets <- list(m1 = c('intercept', 'CPModP', 'CPTrad', 'UNMP', 'tfr'))
 cov_sets[['m2']] <- c(cov_sets[['m1']], 'itu_internet', 'itu_mobile')
-cov_sets[['m3']] <- c(cov_sets[['m2']], 'income_low', 'income_upmid', 'income_high')
+cov_sets[['m3']] <- c(cov_sets[['m2']], 'income_low', 'income_lowmid', 'income_upmid') #'income_high'
 cov_sets[['m4']] <- cov_sets[['m3']]
-cov_sets[['m4bis']] <- cov_sets[['m3']]
-cov_sets[['m5']] <- c(cov_sets[['m2']], 'gdp_pc')
+cov_sets[['m5']] <- cov_sets[['m3']]
+cov_sets[['m6']] <- cov_sets[['m3']]
+cov_sets[['m7']] <- cov_sets[['m3']]
+
+
+#cov_sets[['m6']] <- c(cov_sets[['m2']], 'gdp_pc')
 
 # interactions
 interact_list <- list()
 
-interact_list[['m4']] <- list(c('income_low','itu_internet'),
-                              c('income_upmid','itu_internet'),
-                              c('income_high','itu_internet'))
+interact_list[['m4']] <-  list(c('income_low','CPModP'),
+                               c('income_lowmid','CPModP'),
+                               c('income_upmid','CPModP'))
 
-interact_list[['m4bis']] <-  list(c('income_low','CPModP'),
-                                  c('income_upmid','CPModP'),
-                                  c('income_high','CPModP'))
+interact_list[['m5']] <-  list(c('income_low','UNMP'),
+                               c('income_lowmid','UNMP'),
+                               c('income_upmid','UNMP'))
 
-interact_list[['m5']] <-  list(c('gdp_pc','UNMP'))
+interact_list[['m6']] <-  list(c('income_low','tfr'),
+                               c('income_lowmid','tfr'),
+                               c('income_upmid','tfr'))
+
+interact_list[['m7']] <- list(c('income_low','itu_internet'),
+                              c('income_lowmid','itu_internet'),
+                              c('income_upmid','itu_internet'))
+
+
+#interact_list[['m6']] <-  list(c('gdp_pc','UNMP'))
 
 
 #---- run all models ----#
@@ -115,7 +128,7 @@ for(model_name in names(cov_sets)){
   names.psrf <- names.psrf[!grepl('hat', names.psrf)]
   
   psrf <- coda::gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
-
+  
   # extend until converged
   extend_num <- 0
   psrf_threshold <- 1.2 # i possible, use 1.2 for testing and 1.1 for final models

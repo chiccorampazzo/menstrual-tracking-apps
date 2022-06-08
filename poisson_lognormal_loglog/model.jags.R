@@ -25,7 +25,7 @@ model {
       interactions[k,i] <- alpha[n_covs+i] * X[k,interact[i,1]] * X[k,interact[i,2]]
     }
   }
-
+  
   # missing values
   for(i in 1:n_xmiss){
     for(k in 1:n_countries){
@@ -38,7 +38,7 @@ model {
   for(i in 1:(n_covs + n_interacts)) {
     alpha[i] ~ dnorm(0, pow(5, -2))
   }
-
+  
   
   #---- likelihood 2: observations of app installations ----#
   
@@ -59,7 +59,7 @@ model {
   beta1 ~ dnorm(0, pow(10, -2))
   beta2 ~ dnorm(0, pow(10, -2))
   
-
+  
   #---- derived quantities: app installs by country (all stores and apps) ----#
   
   for(k in 1:n_countries){
