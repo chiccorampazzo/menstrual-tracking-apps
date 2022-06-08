@@ -36,7 +36,7 @@ model {
   # priors
   sigma ~ dunif(0, 5)
   for(i in 1:(n_covs + n_interacts)) {
-    alpha[i] ~ dnorm(0, pow(5, -2))
+    alpha[i] ~ dnorm(0, pow(10, -2))
   }
   
   
