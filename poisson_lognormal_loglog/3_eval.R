@@ -27,34 +27,37 @@ fits <- list.files(file.path('out', 'mcmc'), full.names=T)
 for(i in 1:length(fits)){
   
   model_name <- tools::file_path_sans_ext(basename(fits[i]))
-  message(paste0('Trace plots: ', model_name))
   
   dir.create(file.path(outdir, model_name), showWarnings=F, recursive=T)
   
-  fit <- readRDS(file.path(fits[i]))
-  d <- mcmcToDataframe(fit$mcmc)
+  tracedir <- file.path(outdir, model_name, 'trace')
+  summaryfile <- file.path(outdir, model_name, 'summary.csv')
+  if(!dir.exists(tracedir) | !file.exists(summaryfile) | overwrite){
+    fit <- readRDS(file.path(fits[i]))
+    d <- mcmcToDataframe(fit$mcmc)
+  }
   
   # trace plots
-  tracedir <- file.path(outdir, model_name, 'trace')
   if(!dir.exists(tracedir) | overwrite){
+    message(paste0('Trace plots: ', model_name))
     trace(fit, 
           tracedir = tracedir,
           vars = grep('hat', varnames(fit$mcmc), invert=T, value=T))
   }
   
   # parameter summaries
-  outfile <- file.path(outdir, model_name, 'summary.csv')
-  if(!file.exists(outfile) | overwrite){
+  if(!file.exists(summaryfile) | overwrite){
+    message(paste0('Summary statistics: ', model_name))
     fit.summary <- summary(fit$mcmc)
     fit.summary <- data.frame(cbind(fit.summary$statistics, fit.summary$quantiles))
     
-    write.csv(fit.summary, file.path(outdir, model_name, 'summary.csv'))
+    write.csv(fit.summary, summaryfile)
   }
 }
 
 # setup fit analysis
 eval_types <- c('insample', 'outsample')
-responses <- c('pop', 'installs')
+responses <- c('country', 'app')
 
 # setup data.frame for residuals analysis
 names_residual <- c('model', 'response', 'eval_type', 'stat', 'r2',
@@ -91,9 +94,9 @@ for(i in 1:length(fits)){
         d <- readRDS(dfile)  
       }
       
-      if(response == 'pop') {
-        hat <- paste0('pop_hat[',1:fit$md$n_countries,']')
-        obs <- fit$md$pop
+      if(response == 'country') {
+        hat <- paste0('play_installs_hat[',1:fit$md$n_countries,']')
+        obs <- fit$md$play_installs
       } else {
         hat <- paste0('installs_hat[',1:fit$md$n_apps,',1]')
         obs <- fit$md$installs[,1]
@@ -107,7 +110,7 @@ for(i in 1:length(fits)){
         if(!file.exists(outfile) | overwrite){
           dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
           plotFit(dat, 
-                  file = outfile, 
+                  file = outfile,
                   predCol = stat, 
                   main = paste(eval_type, 'fit:', model_name, stat, response))
         }
@@ -116,7 +119,7 @@ for(i in 1:length(fits)){
         if(!file.exists(outfile) | overwrite){
           dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
           plotFit(dat, 
-                  file = outfile, 
+                  file = outfile,
                   predCol = stat, 
                   zoom = 0.8, 
                   main = paste(eval_type, 'fit:', model_name, stat, response, '(zoom)'))
@@ -125,7 +128,7 @@ for(i in 1:length(fits)){
         # analyze residuals
         dat <- plotDat(d, obs=obs, hat=hat, alpha=alpha)
         dat$resid <- dat[,stat] - dat$obs
-        dat$resid_std <- resid / dat$obs
+        dat$resid_std <- dat$resid / dat$obs
         
         residual_row <- data.frame(matrix(NA, nrow=1, ncol=length(names_residual)))
         names(residual_row) <- names_residual
@@ -141,7 +144,8 @@ for(i in 1:length(fits)){
         residual_row$bias_std <- mean(dat$resid_std, na.rm=T)
         residual_row$imprecision_std <- sd(dat$resid_std, na.rm=T)
         residual_row$inaccuracy_std <- mean(abs(dat$resid_std), na.rm=T)
-        
+        residual_row$propCI <- mean(dat$obs > dat$lower & dat$obs < dat$upper, na.rm=T)
+
         residual <- rbind(residual, residual_row)
       }
     }

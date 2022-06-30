@@ -17,6 +17,10 @@ for(i in list.files('R')) source(file.path('R',i))
 outdir <- file.path('out', 'mcmc')
 dir.create(outdir, recursive=T, showWarnings=F)
 
+# user options
+overwrite <- F
+psrf_threshold <- 1.1  # use 1.2 for testing and 1.1 for final models
+
 # load data
 appstore <- read.csv("../data/appstore_m1.csv", 
                      stringsAsFactors = F, 
@@ -29,6 +33,12 @@ covs <- read.csv("../data/covariates_installations.csv",
                  row.names = 'country')
 sum_by_country <- read.csv("../data/sum.csv", 
                            stringsAsFactors = F)
+
+# drop countries missing required data
+drop_countries <- covs$iso_2c[is.na(covs$popFage)]
+covs <- covs[!covs$iso_2c %in% drop_countries,]
+sum_by_country <- sum_by_country[!sum_by_country$iso_2c %in% drop_countries,]
+
 
 # format covariates as numeric
 continuous_covs <- which(names(covs)=='CPAnyP'):which(names(covs)=='gdp_pc')
@@ -76,7 +86,6 @@ interact_list[['m7']] <- list(c('income_low','itu_internet'),
 
 
 #---- run all models ----#
-overwrite <- F
 for(model_name in names(cov_sets)){
   
   outfile <- file.path(outdir, paste0(model_name, '.rds'))
@@ -99,12 +108,13 @@ for(model_name in names(cov_sets)){
   # monitor
   monitor <- c('beta0', 'beta1', 'beta2',
                'alpha', 'sigma', 
+               # 'r',
                paste0('installs[',1:md$n_apps,',2]'), 
-               'installs_country', 'rate')
+               'store_installs_app', 'rate')
   
   # monitor for eval
   monitor <- c(monitor, 
-               'pop_hat', 
+               'play_installs_hat',
                paste0('installs_hat[',1:md$n_apps,',1]'))
   
   # initials
@@ -125,13 +135,12 @@ for(model_name in names(cov_sets)){
   
   # check convergence
   names.psrf <- coda::varnames(fit$mcmc)
-  names.psrf <- names.psrf[!grepl('hat', names.psrf)]
+  names.psrf <- names.psrf[!grepl('hat', names.psrf) & !grepl('store_installs_app', names.psrf)]
   
   psrf <- coda::gelman.diag(fit$mcmc[,names.psrf], multivariate=F)
   
   # extend until converged
   extend_num <- 0
-  psrf_threshold <- 1.2 # i possible, use 1.2 for testing and 1.1 for final models
   while(max(psrf$psrf[,'Upper C.I.']) > psrf_threshold & extend_num < 10){
     
     extend_num <- extend_num + 1

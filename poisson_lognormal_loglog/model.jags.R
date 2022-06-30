@@ -1,19 +1,15 @@
 model {
   
-  #---- likelihood 1 (process model): rates of fertility app usage by country ----#
+  
+  #---- model 1 (process model): rates of fertility app usage by country ----#
   
   for(k in 1:n_countries){
     
-    # likelihood: rate of app installations per woman (pop) by country (k)
-    pop[k] ~ dpois(installs_country[k] / rate[k])
+    # rate of app installations per woman (pop) by country (k)
     rate[k] ~ dlnorm(mu[k], pow(sigma, -2))
-    
-    mu[k] <- effects[k] + sum(interactions[k,])
-    
-    # posterior predictions
-    pop_hat[k] ~ dpois(installs_country[k] / rate_hat[k])
     rate_hat[k] ~ dlnorm(mu[k], pow(sigma, -2))
-    
+
+    mu[k] <- effects[k] + sum(interactions[k,])
   }
   
   # covariate effects
@@ -27,12 +23,12 @@ model {
   }
   
   # missing values
-  for(i in 1:n_xmiss){
-    for(k in 1:n_countries){
+  for(k in 1:n_countries){
+    for(i in 1:n_xmiss){
       X[k, i_xmiss[i]] ~ dnorm(0, pow(1, -2))
     }
   }
-  
+
   # priors
   sigma ~ dunif(0, 5)
   for(i in 1:(n_covs + n_interacts)) {
@@ -40,17 +36,33 @@ model {
   }
   
   
-  #---- likelihood 2: observations of app installations ----#
+  #---- model 2: total app installations per country ----#
+  for(k in 1:n_countries){
+    
+    play_installs[k] ~ 
+      dpois(max(0, pop[k] * rate[k] - sum(store_installs_app[1:n_apps, k])))
+    
+    play_installs_hat[k] ~ 
+      dpois(max(0, pop[k] * rate_hat[k] - sum(store_installs_app_hat[1:n_apps, k])))
+    
+    # app store installs per app per country
+    for(i in 1:n_apps){
+      store_installs_app[i,k] <- installs[i, 2] * pi[i,k]
+      store_installs_app_hat[i,k] <- installs_hat[i, 2] * pi[i,k]
+    }
+  }
+  
+  
+  #---- model 3: installations by app and store ----#
   
   for(i in 1:n_apps){
     for(j in 1:n_stores){
       
-      # likelihood: installations per app from playstore (observed) and appstore (predicted)
-      installs[i,j] ~ dpois(lambda[i,j])
-      log(lambda[i,j]) <- beta0 + beta1 * log(reviews[i,j]) + beta2 * log(ratings[i,j]) 
+      # installations per app from playstore (observed) and appstore (predicted)
+      installs[i,j] ~ dpois(lambda[i,j]) # dnegbin(r / (r + lambda[i,j]), r)  
+      installs_hat[i,j] ~ dpois(lambda[i,j]) 
       
-      # posterior predictions
-      installs_hat[i,j] ~ dpois(lambda[i,j])
+      log(lambda[i,j]) <- beta0 + beta1 * log(reviews[i,j]) + beta2 * log(ratings[i,j]) 
     }
   }
   
@@ -58,27 +70,5 @@ model {
   beta0 ~ dnorm(0, pow(10, -2))
   beta1 ~ dnorm(0, pow(10, -2))
   beta2 ~ dnorm(0, pow(10, -2))
-  
-  
-  #---- derived quantities: app installs by country (all stores and apps) ----#
-  
-  for(k in 1:n_countries){
-    
-    # total installs by country
-    installs_country[k] <- sum(installs_app_country[1:n_apps, k])
-    
-    for(i in 1:n_apps){
-      
-      # installs per app per country
-      installs_app_country[i,k] <- sum(installs[i, 1:n_stores]) * pi[i,k]
-    }
-  }
-  
-  # derived for posterior predictions
-  for(k in 1:n_countries){
-    installs_country_hat[k] <- sum(installs_app_country_hat[1:n_apps, k])
-    for(i in 1:n_apps){
-      installs_app_country_hat[i,k] <- sum(installs_hat[i, 1:n_stores]) * pi[i,k]
-    }
-  }  
+  # r ~ dunif(1, 100)
 }

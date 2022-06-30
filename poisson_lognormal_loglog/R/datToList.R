@@ -127,6 +127,14 @@ datToList <- function(appstore, playstore, covs, sum_by_country,
     }
   }
   
+  # observed installs per country
+  play_installs <- rep(0, length(countries))
+  for(k in 1:length(countries)){
+    for(i in 1:length(apps)){
+      play_installs[k] <- play_installs[k] + (installs[i,1] * pi[i,k])
+    }
+  }
+  
   # jags data
   md <- list(n_apps = length(apps),
               n_countries = length(countries),
@@ -137,6 +145,7 @@ datToList <- function(appstore, playstore, covs, sum_by_country,
               ratings = ratings,
               pop = population,
               pi = pi,
+             play_installs = ceiling(play_installs),
               X = X,
               i_xmiss = i_xmiss,
               n_xmiss = length(i_xmiss),
