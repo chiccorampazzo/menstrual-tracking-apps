@@ -2,10 +2,11 @@
 rm(list=ls());gc();cat("\014");try(dev.off())
 
 # packages
-# install.packages(c('runjags', 'coda', 'fastDummies'))
+# install.packages(c('runjags', 'coda', 'fastDummies', 'tidyverse'))
 library(runjags)
 library(coda)
 library(fastDummies)
+library(tidyverse)
 
 # working directory
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
