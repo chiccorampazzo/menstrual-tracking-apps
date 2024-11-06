@@ -40,6 +40,11 @@ The data and code to reproduce the Bayesian analysis are provided in the `./anal
 ### Topic modelling
 The data and code to reproduce the topic modelling are provided in the `./topic_model/` folder. The run the topic modelling analysis, follow these steps:
 
+1. Ensure you have installed all of the libraries and packages requires for the analysis (listed in the first lines of each script).
+2. Using R, clean the web-scraped data (`01_language_filtering.R`).
+     This requires the web-scraped reviews to be stored locally.
+3. In Jupyer Python, Once complete, run the python files sequentially - first English (the primary script for the results), Portuguese, and Spanish.
+4. Return to R (`04_figures.R`) to interpret the results of the python-generated topic model. Here, you will also need to create 'broader groups' of topics, or alternatively, run the analysis with each topic being separate. We did this manually in a csv file once interpreting the individual categories and grouping them according to their similaraties. Scripts also exist for the Portuguese Spanish-trained text models. 
 
 ## Contributing
 
