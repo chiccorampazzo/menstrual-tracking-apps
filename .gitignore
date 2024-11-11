@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-out
-bak
+.DS_Store
+**/out/
+**/bak/
