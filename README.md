@@ -6,6 +6,9 @@ This repository contains the data and code accompanying the following publicatio
 
 A SocArXiv pre-print of the manuscript is available from: https://doi.org/10.31235/osf.io/2va3n
 
+If you modify and improve the code or use the data, please cite:
+https://doi.org/10.5281/zenodo.14191651
+
 ## Project Description
 
 This project investigates the global usage of fertility tracking apps based on download, review, and ratings data from the Google Play Store and Apple App Store. It is the first comprehensive study to quantify fertility tracking app use globally, extending beyond the Global North, and includes analysis of macro- and micro-level predictors of app usage.
