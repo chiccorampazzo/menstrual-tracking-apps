@@ -64,7 +64,9 @@ This repository is licensed under the GNU General Public License v3.0 (GPLv3). S
 
 For questions or further information, please contact: Dr. Francesco Rampazzo (@chiccorampazzo), [francesco.rampazzo@demography.ox.ac.uk](mailto:Francesco.rampazzo@demography.ox.ac.uk)
 
-For inquiries related to the publication, you may also consult the SocArXiv pre-print: https://doi.org/10.31235/osf.io/2va3n.
+For inquiries related to the publication, you may consult the peer-reviewed article in _Digital Health_: https://doi.org/10.1177/20552076241298315. 
+
+The paper is also available as a SocArXiv pre-print: https://doi.org/10.31235/osf.io/2va3n.
 
 ## Acknowledgments
 
