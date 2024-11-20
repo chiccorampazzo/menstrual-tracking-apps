@@ -8,11 +8,12 @@ library(coda)
 library(fastDummies)
 library(tidyverse)
 
-# working directory
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-
 # load functions
 for(i in list.files('R')) source(file.path('R',i))
+
+# working directory
+# Note: Open fertility-apps.Rproj to automatically set the correct working directory
+# Note: Alternatively, manually set the working directory to the base directory of the fertility-apps repository using setwd()
 
 # output directory
 outdir <- file.path('out', 'mcmc')
@@ -23,16 +24,16 @@ overwrite <- F
 psrf_threshold <- 1.1  # use 1.2 for testing and 1.1 for final models
 
 # load data
-appstore <- read.csv("../data/appstore_m1.csv", 
+appstore <- read.csv("./data/appstore_m1.csv", 
                      stringsAsFactors = F, 
                      row.names = 'app')
-playstore <- read.csv("../data/playstore_m1.csv", 
+playstore <- read.csv("./data/playstore_m1.csv", 
                       stringsAsFactors = F, 
                       row.names = 'app')
-covs <- read.csv("../data/covariates_installations.csv", 
+covs <- read.csv("./data/covariates_installations.csv", 
                  stringsAsFactors = F, 
                  row.names = 'country')
-sum_by_country <- read.csv("../data/sum.csv", 
+sum_by_country <- read.csv("./data/sum.csv", 
                            stringsAsFactors = F)
 
 # drop countries missing required data
