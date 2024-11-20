@@ -2,7 +2,7 @@
 
 This repository contains the data and code accompanying the following publication:
 
-> Rampazzo F, Raybould A, Rampazzo P, Barker R, Leasure DR. 2024. "UPDATE: I'm pregnant!": Inferring global downloads and reasons for using Menstrual Tracking Apps. *Digital Health*. [in press]
+> Rampazzo F, Raybould A, Rampazzo P, Barker R, Leasure DR. 2024. "UPDATE: I'm pregnant!": Inferring global downloads and reasons for using Menstrual Tracking Apps. *Digital Health*. https://doi.org/10.1177/20552076241298315
 
 A SocArXiv pre-print of the manuscript is available from: https://doi.org/10.31235/osf.io/2va3n
 
