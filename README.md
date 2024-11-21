@@ -11,6 +11,8 @@ https://doi.org/10.5281/zenodo.14191651
 
 In this Zenodo repository, you will find additional data for the text analysis.
 
+Finally, the scraper for the Google Play Store and Apple App Store is available at: https://github.com/peterampazzo/app-reviews-scraper.
+
 ## Project Description
 
 This project investigates the global usage of fertility tracking apps based on download, review, and ratings data from the Google Play Store and Apple App Store. It is the first comprehensive study to quantify fertility tracking app use globally, extending beyond the Global North, and includes analysis of macro- and micro-level predictors of app usage.
